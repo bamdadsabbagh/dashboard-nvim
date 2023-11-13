@@ -112,8 +112,8 @@ local function generate_header(config)
         and config.week_header.enable
         and week_header(config.week_header.concat, config.week_header.append)
       or (config.header or default_header())
-    -- api.nvim_buf_set_lines(config.bufnr, 0, -1, false, utils.center_align(header))
-    api.nvim_buf_set_lines(config.bufnr, 0, -1, false, header)
+    api.nvim_buf_set_lines(config.bufnr, 0, -1, false, utils.center_align(header))
+    -- api.nvim_buf_set_lines(config.bufnr, 0, -1, false, header)
 
     for i, _ in ipairs(header) do
       vim.api.nvim_buf_add_highlight(config.bufnr, 0, 'DashboardHeader', i - 1, 0, -1)
@@ -122,8 +122,8 @@ local function generate_header(config)
   end
 
   local empty_table = utils.generate_empty_table(config.file_height + 4)
-  -- api.nvim_buf_set_lines(config.bufnr, 0, -1, false, utils.center_align(empty_table))
-  api.nvim_buf_set_lines(config.bufnr, 0, -1, false, empty_table)
+  api.nvim_buf_set_lines(config.bufnr, 0, -1, false, utils.center_align(empty_table))
+  -- api.nvim_buf_set_lines(config.bufnr, 0, -1, false, empty_table)
   local preview = require('dashboard.preview')
   preview:open_preview({
     width = config.file_width,

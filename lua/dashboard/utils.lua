@@ -52,9 +52,10 @@ function utils.center_align(tbl)
 
   local centered_lines = {}
   local fills = fill_sizes(tbl)
+  local max = math.max(unpack(fills))
 
   for i = 1, #tbl do
-    local fill_line = (' '):rep(fills[i]) .. tbl[i]
+    local fill_line = (' '):rep(max) .. tbl[i]
     table.insert(centered_lines, fill_line)
   end
 

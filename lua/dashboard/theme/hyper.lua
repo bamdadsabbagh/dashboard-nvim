@@ -187,8 +187,10 @@ local function mru_list(config)
     local filename = vim.fn.fnamemodify(file, ':t')
     local icon, group = utils.get_icon(filename)
     icon = icon or ' '
-    if not utils.is_win then
-      file = file:gsub(vim.env.HOME, '~')
+    if config.mru.cwd_only then
+      file = vim.fn.fnamemodify(file, ':.')
+    elseif not utils.is_win then
+      file = vim.fn.fnamemodify(file, ':~')
     end
     file = icon .. ' ' .. file
     table.insert(groups, { #icon, group })
@@ -280,10 +282,20 @@ local function map_key(config, key, content)
   keymap.set('n', key, function()
     local text = content or api.nvim_get_current_line()
     local scol = utils.is_win and text:find('%w') or text:find('%p')
-    text = text:sub(scol)
-    local path = text:sub(1, text:find('%w(%s+)$'))
-    path = vim.fs.normalize(path)
-    if vim.fn.isdirectory(path) == 1 then
+    local path = nil
+
+    if scol ~= nil then -- scol == nil if pressing enter in empty space
+      if text:sub(scol, scol + 1) ~= '~/' then -- is relative path
+        scol = math.min(text:find('%w'), text:find('%p'))
+      end
+      text = text:sub(scol)
+      path = text:sub(1, text:find('%w(%s+)$'))
+      path = vim.fs.normalize(path)
+    end
+
+    if path == nil then
+      vim.cmd('enew')
+    elseif vim.fn.isdirectory(path) == 1 then
       vim.cmd('lcd ' .. path)
       if type(config.project.action) == 'function' then
         config.project.action(path)
@@ -296,7 +308,7 @@ local function map_key(config, key, content)
         end
       end
     else
-      vim.cmd('edit ' .. path)
+      vim.cmd('edit ' .. vim.fn.fnameescape(path))
       local root = utils.get_vcs_root()
       if not config.change_to_vcs_root then
         return
